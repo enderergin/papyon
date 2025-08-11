@@ -26,7 +26,9 @@
             display: grid;
             /* Butonlar için minimum genişlik 128px olarak ayarlandı */
             grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
-            gap: 12px;
+            /* Dikey boşluk azaltıldı */
+            gap-x: 12px;
+            gap-y: 2px;
             /* Butonların yer değişimini daha hızlı hale getirdik (0.2s) */
             position: relative;
         }
@@ -70,7 +72,7 @@
         </div>
 
         <!-- Butonlar için grid konteyneri -->
-        <div id="button-grid" class="w-full flex-grow p-2 grid grid-cols-2 sm:grid-cols-4 gap-4 place-items-center">
+        <div id="button-grid" class="w-full flex-grow p-2 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-0.5 place-items-center">
             <!-- JavaScript ile butonlar buraya eklenecek -->
         </div>
 
