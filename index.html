@@ -3,21 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Papyonu Bul Oyunu</title>
+<title>Papyonu Bul</title>
 <style>
     body {
         margin: 0;
         padding: 0;
+        text-align: center;
+    }
+    h2 {
+        margin: 10px 0;
     }
     .grid {
         display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 0 !important; /* Tüm boşluğu sıfırla */
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0 !important; /* boşluk tamamen yok */
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
     }
     .grid button {
         margin: 0 !important;
         padding: 0 !important;
         border: none;
+        width: 100%;
+        height: 180px; /* mobilde uyumlu */
     }
     .grid button img {
         width: 100%;
@@ -29,19 +38,19 @@
 </head>
 <body>
 
-<h2 style="text-align:center;">Papyonu Bul</h2>
+<h2>Papyonu Bul</h2>
 <div id="gameGrid" class="grid"></div>
 
 <script>
-const correctImageUrl = "https://via.placeholder.com/100x100/00ff00?text=Papyon";
+const correctImageUrl = "https://via.placeholder.com/300x300/00ff00?text=Papyon";
 const wrongImageUrls = [
-    "https://via.placeholder.com/100x100/ff0000?text=X",
-    "https://via.placeholder.com/100x100/0000ff?text=X",
-    "https://via.placeholder.com/100x100/ffff00?text=X"
+    "https://via.placeholder.com/300x300/ff0000?text=X",
+    "https://via.placeholder.com/300x300/0000ff?text=X",
+    "https://via.placeholder.com/300x300/ffff00?text=X"
 ];
-const hiddenImageUrl = "https://via.placeholder.com/100x100/cccccc?text=?";
+const hiddenImageUrl = "https://via.placeholder.com/300x300/cccccc?text=?";
 
-const totalButtons = 49;
+const totalButtons = 4;
 let clickCount = 0;
 let correctButtonIndex = Math.floor(Math.random() * totalButtons);
 
@@ -66,7 +75,7 @@ function handleClick(e) {
     clickCount++;
 
     if (clickCount === 49) {
-        correctButtonIndex = index; // Son tıklamada doğru çıkacak
+        correctButtonIndex = index; // 49. tıklamada doğru olacak
     }
 
     if (index === correctButtonIndex) {
