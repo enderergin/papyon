@@ -27,7 +27,6 @@
             grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
             gap: 12px;
             /* Butonların yer değişimini yumuşatır */
-            transition: all 0.5s ease-in-out;
             position: relative;
         }
         
@@ -150,31 +149,34 @@
             // Butonların konumlarını rastgele karıştırır ve animasyon ekler
             function shufflePositions() {
                 const buttons = Array.from(buttonGrid.children);
-                const shuffledOrder = [...Array(buttons.length).keys()];
-                shuffleArray(shuffledOrder);
+                // Butonların başlangıç pozisyonlarını al
+                const initialPositions = buttons.map(button => button.getBoundingClientRect());
                 
-                const initialPositions = buttons.map(button => {
-                    const rect = button.getBoundingClientRect();
-                    return { left: rect.left, top: rect.top };
-                });
+                // Butonları rastgele karıştır
+                const shuffledButtons = [...buttons];
+                shuffleArray(shuffledButtons);
+                
+                // Butonları DOM'da yeni sıraya göre yerleştir
+                shuffledButtons.forEach(button => buttonGrid.appendChild(button));
 
-                shuffledOrder.forEach((newIndex, currentIndex) => {
-                    buttonGrid.appendChild(buttons[newIndex]);
-                });
-
-                const finalPositions = buttons.map(button => {
-                    const rect = button.getBoundingClientRect();
-                    return { left: rect.left, top: rect.top };
-                });
+                // Butonların yeni pozisyonlarını al
+                const finalPositions = buttons.map(button => button.getBoundingClientRect());
 
                 buttons.forEach((button, index) => {
+                    // Eski pozisyondan yeni pozisyona ne kadar hareket etmesi gerektiğini hesapla
                     const deltaX = initialPositions[index].left - finalPositions[index].left;
                     const deltaY = initialPositions[index].top - finalPositions[index].top;
 
+                    // Butonu anında eski pozisyonuna geri taşı
+                    button.style.transition = 'none';
                     button.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
                     
+                    // Bir sonraki animasyon karesinde animasyonu başlat
                     requestAnimationFrame(() => {
-                        button.style.transform = '';
+                        requestAnimationFrame(() => {
+                            button.style.transition = 'transform 0.5s ease-in-out';
+                            button.style.transform = ''; // Yeni pozisyonuna geçişi animasyonla yap
+                        });
                     });
                 });
             }
@@ -199,7 +201,6 @@
                     button.appendChild(hiddenImage);
 
                     const revealedImage = document.createElement('img');
-                    // Bu kısımda, her butona başlangıçta rastgele bir yanlış resim atanır
                     revealedImage.src = wrongImageAssignment[i];
                     revealedImage.classList.add('button-content', 'hidden-content'); 
                     button.appendChild(revealedImage);
@@ -213,7 +214,6 @@
                  const hiddenImage = button.querySelector('.button-content.revealed-content');
                  const revealedImage = button.querySelector('.button-content.hidden-content');
                  
-                 // Resim kaynağını güncelle
                  revealedImage.src = imageUrl;
 
                  if (revealedImage) revealedImage.classList.remove('hidden-content');
@@ -225,7 +225,6 @@
                      isAnimating = false;
                  } else {
                     setTimeout(() => {
-                        // Yanlış resim gösterildikten sonra gizlenir ve butonların konumu karıştırılır
                         if (revealedImage) revealedImage.classList.add('hidden-content');
                         if (hiddenImage) hiddenImage.classList.remove('hidden-content');
                         isAnimating = false;
@@ -249,7 +248,6 @@
                 if (clickCount === 39) {
                     revealButton(clickedButton, correctImageUrl, true);
                 } else {
-                    // Her yanlış tıklamada, rastgele bir yanlış fotoğraf gösterilir
                     const randomWrongImage = wrongImageUrls[Math.floor(Math.random() * wrongImageUrls.length)];
                     revealButton(clickedButton, randomWrongImage, false);
                 }
