@@ -1,124 +1,86 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kaçan Resim</title>
   <style>
-    html, body {
-      height: 100%;
+    body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #f0f8ff, #e6ffe9);
+      height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
-    }
-
-    .stage {
-      width: 100%;
-      height: 100%;
-      position: relative;
+      align-items: center;
+      background-color: #f0f0f0;
       overflow: hidden;
-      touch-action: none;
     }
-
-    .runner {
-      position: absolute;
-      width: 25vw;
-      max-width: 160px;
-      height: auto;
-      border-radius: 8px;
-      transition: left 0.25s ease, top 0.25s ease;
-      pointer-events: none;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    #container {
+      position: relative;
+      width: 80vw;
+      height: 80vh;
+      border: 2px solid #ccc;
+      background-color: white;
+      overflow: hidden;
     }
-
-    .hint {
+    #image {
       position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 14px;
-      background: rgba(255,255,255,0.8);
-      padding: 6px 10px;
-      border-radius: 8px;
-      backdrop-filter: blur(4px);
+      width: 150px;
+      height: 150px;
+      cursor: pointer;
+      transition: left 0.3s ease, top 0.3s ease;
+      user-select: none;
     }
   </style>
 </head>
 <body>
+  <div id="container">
+    <img
+      id="image"
+      src="https://i.ibb.co/Q3TgGt8m"
+      alt="Buzlu Latte"
+      draggable="false"
+    />
+  </div>
 
-<div class="stage" id="stage">
-  <img src="https://i.hizliresim.com/h2tb3m7.png" alt="Kaçan Resim" id="runner" class="runner">
-  <div class="hint">Parmağını veya fareyi yaklaştır, resim kaçsın!</div>
-</div>
+  <script>
+    const container = document.getElementById("container");
+    const img = document.getElementById("image");
 
-<script>
-(function(){
-  const stage = document.getElementById('stage');
-  const img   = document.getElementById('runner');
+    // Başlangıç pozisyonu: ortaya koy
+    img.style.left = (container.clientWidth / 2 - img.clientWidth / 2) + "px";
+    img.style.top = (container.clientHeight / 2 - img.clientHeight / 2) + "px";
 
-  let stageW = stage.clientWidth;
-  let stageH = stage.clientHeight;
-  let imgW = img.clientWidth;
-  let imgH = img.clientHeight;
+    img.addEventListener("mouseenter", () => {
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
 
-  let pos = { x: (stageW - imgW) / 2, y: (stageH - imgH) / 2 };
-  applyPos();
+      const imgWidth = img.clientWidth;
+      const imgHeight = img.clientHeight;
 
-  const escapeRadius = 100;
-  const escapeAmount = 120;
+      // Yeni rastgele pozisyonlar hesapla (container içinde kalacak şekilde)
+      const maxLeft = containerWidth - imgWidth;
+      const maxTop = containerHeight - imgHeight;
 
-  window.addEventListener('resize', () => {
-    stageW = stage.clientWidth;
-    stageH = stage.clientHeight;
-    imgW = img.clientWidth;
-    imgH = img.clientHeight;
-    clampPos();
-    applyPos();
-  });
+      let newLeft = Math.random() * maxLeft;
+      let newTop = Math.random() * maxTop;
 
-  function onMove(x, y) {
-    const imgCenterX = pos.x + imgW / 2;
-    const imgCenterY = pos.y + imgH / 2;
-    const dx = imgCenterX - x;
-    const dy = imgCenterY - y;
-    const dist = Math.hypot(dx, dy);
+      // Mevcut pozisyona çok yakın olmasını önlemek için kontrol
+      const currentLeft = parseFloat(img.style.left);
+      const currentTop = parseFloat(img.style.top);
 
-    if (dist < escapeRadius) {
-      let nx = dx / (dist || 1);
-      let ny = dy / (dist || 1);
-      pos.x += nx * escapeAmount;
-      pos.y += ny * escapeAmount;
-      clampPos();
-      applyPos();
-    }
-  }
+      // Eğer yeni pozisyon çok yakınsa, yeniden hesapla
+      if (
+        Math.abs(newLeft - currentLeft) < 50 &&
+        Math.abs(newTop - currentTop) < 50
+      ) {
+        newLeft = (newLeft + 100) % maxLeft;
+        newTop = (newTop + 100) % maxTop;
+      }
 
-  function clampPos(){
-    pos.x = Math.max(0, Math.min(stageW - imgW, pos.x));
-    pos.y = Math.max(0, Math.min(stageH - imgH, pos.y));
-  }
-
-  function applyPos(){
-    img.style.left = pos.x + 'px';
-    img.style.top  = pos.y + 'px';
-  }
-
-  stage.addEventListener('mousemove', (e) => {
-    const rect = stage.getBoundingClientRect();
-    onMove(e.clientX - rect.left, e.clientY - rect.top);
-  });
-
-  stage.addEventListener('touchmove', (e) => {
-    const rect = stage.getBoundingClientRect();
-    const touch = e.touches[0];
-    onMove(touch.clientX - rect.left, touch.clientY - rect.top);
-  });
-
-})();
-</script>
-
+      // Pozisyonu güncelle
+      img.style.left = newLeft + "px";
+      img.style.top = newTop + "px";
+    });
+  </script>
 </body>
 </html>
