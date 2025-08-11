@@ -1,277 +1,158 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Papyonu Bulma Oyunu</title>
-    <!-- Tailwind CSS'i CDN üzerinden yükler -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            /* Ekranın tamamını kaplar ve taşmaları engeller */
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden; 
-        }
-
-        #game-container {
-            position: relative;
-        }
-
-        /* Butonların yerlerini değiştirmek için grid kullanıyoruz */
-        #button-grid {
-            display: grid;
-            /* Butonlar için minimum genişlik 128px olarak ayarlandı */
-            grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
-            /* Dikey boşluk tamamen kaldırıldı */
-            gap-x: 12px;
-            gap-y: 0px;
-            /* Butonların yer değişimini daha hızlı hale getirdik (0.2s) */
-            position: relative;
-        }
-        
-        .game-button {
-            position: relative;
-            overflow: hidden;
-            border: 2px solid theme('colors.gray.700');
-            /* Animasyon için transition eklendi, hızı 0.2s'ye ayarlandı */
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .button-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .hidden-content {
-            transform: scale(0);
-        }
-
-        .revealed-content {
-            transform: scale(1);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Papyonu Bulma Oyunu</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
+    #button-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+        gap-x: 4px; /* %90 kısaltılmış yatay boşluk */
+        gap-y: 2px; /* %90 kısaltılmış dikey boşluk */
+    }
+    .game-button {
+        position: relative;
+        overflow: hidden;
+        border: 2px solid #444;
+        transition: transform 0.2s ease-in-out;
+    }
+    .button-content {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease-in-out;
+    }
+    .hidden-content {
+        transform: scale(0);
+    }
+    .revealed-content {
+        transform: scale(1);
+    }
+</style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
-    <!-- Oyunun ana konteyneri -->
-    <div id="game-container" class="relative w-full h-full bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col justify-between">
-        
-        <!-- Başlık ve açıklama -->
-        <div class="text-center mb-6">
-            <!-- Başlık "Papyonu Bulma Oyunu" olarak değiştirildi -->
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-amber-400">Papyonu Bulma Oyunu</h1>
-            <!-- Açıklama güncellendi -->
-            <p class="text-xs sm:text-sm text-gray-400 mt-1">Doğru papyonu bulmak için butonlara tıkla!</p>
-        </div>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-2">
 
-        <!-- Butonlar için grid konteyneri -->
-        <!-- p-2 sınıfı kaldırıldı -->
-        <div id="button-grid" class="w-full flex-grow grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-0 place-items-center">
-            <!-- JavaScript ile butonlar buraya eklenecek -->
-        </div>
+<div id="game-container" class="relative w-full h-full bg-gray-800 rounded-2xl shadow-lg p-4 flex flex-col justify-between">
 
-        <!-- Kazanma mesajı -->
-        <div id="win-message" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-20">
-            <div class="bg-green-500 text-white text-center text-3xl sm:text-4xl font-extrabold p-8 rounded-xl shadow-2xl">
-                Kazandın! Doğru Papyonu Buldun!
-                <div class="flex justify-center mt-4">
-                    <!-- Sadece "Linki Aç" butonu kaldı -->
-                    <a href="#" id="win-link" class="px-6 py-3 bg-white text-green-500 font-bold rounded-full text-xl hover:bg-gray-200 flex items-center justify-center">
-                      Linki Aç
-                    </a>
-                </div>
+    <div class="text-center mb-2">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-amber-400">Papyonu Bulma Oyunu</h1>
+        <p class="text-xs text-gray-400 mt-1">Doğru papyonu bulmak için butonlara tıkla!</p>
+    </div>
+
+    <div id="button-grid" class="flex-grow">
+        <!-- Butonlar buraya eklenecek -->
+    </div>
+
+    <div id="win-message" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-20">
+        <div class="bg-green-500 text-white text-center text-2xl sm:text-3xl font-extrabold p-6 rounded-xl shadow-2xl">
+            Kazandın! Doğru Papyonu Buldun!
+            <div class="flex justify-center mt-4">
+                <a href="https://seninlinkin.com" id="win-link" target="_blank"
+                   class="px-4 py-2 bg-white text-green-600 font-bold rounded-full text-lg hover:bg-gray-200">
+                   Linki Aç
+                </a>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        window.onload = function() {
-            // Gerekli HTML elementlerine referanslar
-            const buttonGrid = document.getElementById('button-grid');
-            const winMessage = document.getElementById('win-message');
-            const winLinkButton = document.getElementById('win-link');
+<script>
+window.onload = function() {
+    const buttonGrid = document.getElementById('button-grid');
+    const winMessage = document.getElementById('win-message');
+    const winLinkButton = document.getElementById('win-link');
 
-            // Buton sayısı 4 olarak ayarlandı
-            const totalButtons = 4; 
-            // Fotoğraf linkleri
-            const hiddenImageUrl = 'https://placehold.co/200x200/38bdf8/ffffff?text=Gizli'; 
-            const correctImageUrl = 'https://placehold.co/200x200/4CAF50/ffffff?text=Doğru+Papyon'; 
-            
-            // 20 farklı yanlış fotoğraf URL'si oluşturuldu
-            const wrongImageUrls = [
-                'https://placehold.co/200x200/A00000/ffffff?text=Yanlış-1',
-                'https://placehold.co/200x200/D00000/ffffff?text=Yanlış-2',
-                'https://placehold.co/200x200/E00000/ffffff?text=Yanlış-3',
-                'https://placehold.co/200x200/F00000/ffffff?text=Yanlış-4',
-                'https://placehold.co/200x200/A05000/ffffff?text=Yanlış-5',
-                'https://placehold.co/200x200/B06000/ffffff?text=Yanlış-6',
-                'https://placehold.co/200x200/C07000/ffffff?text=Yanlış-7',
-                'https://placehold.co/200x200/D08000/ffffff?text=Yanlış-8',
-                'https://placehold.co/200x200/A0A000/ffffff?text=Yanlış-9',
-                'https://placehold.co/200x200/B0B000/ffffff?text=Yanlış-10',
-                'https://placehold.co/200x200/C0C000/ffffff?text=Yanlış-11',
-                'https://placehold.co/200x200/D0D000/ffffff?text=Yanlış-12',
-                'https://placehold.co/200x200/00A000/ffffff?text=Yanlış-13',
-                'https://placehold.co/200x200/00B000/ffffff?text=Yanlış-14',
-                'https://placehold.co/200x200/00C000/ffffff?text=Yanlış-15',
-                'https://placehold.co/200x200/00D000/ffffff?text=Yanlış-16',
-                'https://placehold.co/200x200/00A0A0/ffffff?text=Yanlış-17',
-                'https://placehold.co/200x200/00B0B0/ffffff?text=Yanlış-18',
-                'https://placehold.co/200x200/00C0C0/ffffff?text=Yanlış-19',
-                'https://placehold.co/200x200/00D0D0/ffffff?text=Yanlış-20'
-            ];
-            
-            // 4 butona uyacak şekilde 4 renk eklendi
-            const buttonColors = [
-                'bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500'
-            ];
-            
-            let isGameOver = false;
-            let isAnimating = false;
-            let clickCount = 0; 
-            let wrongImageAssignment = []; 
+    const totalButtons = 4;
+    const hiddenImageUrl = 'https://placehold.co/200x200/38bdf8/ffffff?text=Gizli';
+    const correctImageUrl = 'https://placehold.co/200x200/4CAF50/ffffff?text=Doğru+Papyon';
 
-            // Oyunu sıfırlayan ve başlatan fonksiyon
-            function resetGame() {
-                isGameOver = false;
+    const wrongImageUrls = [
+        'https://placehold.co/200x200/A00000/ffffff?text=Yanlış-1',
+        'https://placehold.co/200x200/D00000/ffffff?text=Yanlış-2',
+        'https://placehold.co/200x200/E00000/ffffff?text=Yanlış-3',
+        'https://placehold.co/200x200/F00000/ffffff?text=Yanlış-4'
+    ];
+
+    const buttonColors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500'];
+
+    let isGameOver = false;
+    let isAnimating = false;
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function createButtons() {
+        buttonGrid.innerHTML = '';
+        for (let i = 0; i < totalButtons; i++) {
+            const button = document.createElement('button');
+            button.classList.add(
+                'game-button', buttonColors[i % buttonColors.length],
+                'text-4xl', 'font-bold', 'text-white', 'p-2', 'rounded-xl',
+                'aspect-square', 'w-full'
+            );
+            const hiddenImage = document.createElement('img');
+            hiddenImage.src = hiddenImageUrl;
+            hiddenImage.classList.add('button-content', 'revealed-content');
+
+            const revealedImage = document.createElement('img');
+            revealedImage.src = wrongImageUrls[i % wrongImageUrls.length];
+            revealedImage.classList.add('button-content', 'hidden-content');
+
+            button.appendChild(hiddenImage);
+            button.appendChild(revealedImage);
+            buttonGrid.appendChild(button);
+        }
+    }
+
+    function revealButton(button, imageUrl, isCorrect) {
+        const hiddenImage = button.querySelector('.button-content.revealed-content');
+        const revealedImage = button.querySelector('.button-content.hidden-content');
+
+        revealedImage.src = imageUrl;
+        revealedImage.classList.remove('hidden-content');
+        hiddenImage.classList.add('hidden-content');
+
+        if (isCorrect) {
+            winMessage.classList.remove('hidden');
+            isGameOver = true;
+            isAnimating = false;
+        } else {
+            setTimeout(() => {
+                revealedImage.classList.add('hidden-content');
+                hiddenImage.classList.remove('hidden-content');
                 isAnimating = false;
-                clickCount = 0;
-                winMessage.classList.add('hidden');
-                // Oyun başlangıcında her butona rastgele bir yanlış resim atanır
-                wrongImageAssignment = [...wrongImageUrls];
-                shuffleArray(wrongImageAssignment);
-                createButtons();
-                shufflePositions();
-            }
+            }, 500);
+        }
+    }
 
-            // Diziyi karıştıran fonksiyon (Fisher-Yates algoritması)
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-            }
+    buttonGrid.addEventListener('click', (event) => {
+        if (isGameOver || isAnimating) return;
+        const clickedButton = event.target.closest('button');
+        if (!clickedButton) return;
+        isAnimating = true;
+        const isCorrect = Math.random() < 0.25; // %25 ihtimalle doğru papyon çıkar
+        revealButton(clickedButton, isCorrect ? correctImageUrl : wrongImageUrls[Math.floor(Math.random() * wrongImageUrls.length)], isCorrect);
+    });
 
-            // Butonların konumlarını rastgele karıştırır ve animasyon ekler
-            function shufflePositions() {
-                const buttons = Array.from(buttonGrid.children);
-                // Butonların başlangıç pozisyonlarını al
-                const initialPositions = buttons.map(button => button.getBoundingClientRect());
-                
-                // Butonları rastgele karıştır
-                const shuffledButtons = [...buttons];
-                shuffleArray(shuffledButtons);
-                
-                // Butonları DOM'da yeni sıraya göre yerleştir
-                shuffledButtons.forEach(button => buttonGrid.appendChild(button));
+    createButtons();
+};
+</script>
 
-                // Butonların yeni pozisyonlarını al
-                const finalPositions = buttons.map(button => button.getBoundingClientRect());
-
-                buttons.forEach((button, index) => {
-                    // Eski pozisyondan yeni pozisyona ne kadar hareket etmesi gerektiğini hesapla
-                    const deltaX = initialPositions[index].left - finalPositions[index].left;
-                    const deltaY = initialPositions[index].top - finalPositions[index].top;
-
-                    // Butonu anında eski pozisyonuna geri taşı
-                    button.style.transition = 'none';
-                    button.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-                    
-                    // Bir sonraki animasyon karesinde animasyonu başlat
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            // Hız 0.2s'ye düşürüldü
-                            button.style.transition = 'transform 0.2s ease-in-out';
-                            button.style.transform = ''; // Yeni pozisyonuna geçişi animasyonla yap
-                        });
-                    });
-                });
-            }
-
-            // Butonları oluşturur
-            function createButtons() {
-                buttonGrid.innerHTML = '';
-                
-                for (let i = 0; i < totalButtons; i++) {
-                    const button = document.createElement('button');
-                    button.classList.add(
-                        'game-button', buttonColors[i % buttonColors.length],
-                        // Buton boyutu ve yazı tipi büyütüldü
-                        'text-4xl', 'font-bold', 'text-white', 'p-4', 'rounded-xl', 'shadow-md',
-                        'transition-colors', 'duration-150', 'ease-in-out',
-                        'aspect-square', 'w-full'
-                    );
-                    button.dataset.buttonIndex = i;
-                    
-                    const hiddenImage = document.createElement('img');
-                    // Gizli ve doğru resimlerin boyutları güncellendi
-                    hiddenImage.src = hiddenImageUrl;
-                    hiddenImage.classList.add('button-content', 'revealed-content'); 
-                    button.appendChild(hiddenImage);
-
-                    const revealedImage = document.createElement('img');
-                    revealedImage.src = wrongImageAssignment[i];
-                    revealedImage.classList.add('button-content', 'hidden-content'); 
-                    button.appendChild(revealedImage);
-                    
-                    buttonGrid.appendChild(button);
-                }
-            }
-
-            // Butonun içeriğini ortaya çıkaran fonksiyon
-            function revealButton(button, imageUrl, isCorrect) {
-                 const hiddenImage = button.querySelector('.button-content.revealed-content');
-                 const revealedImage = button.querySelector('.button-content.hidden-content');
-                 
-                 revealedImage.src = imageUrl;
-
-                 if (revealedImage) revealedImage.classList.remove('hidden-content');
-                 if (hiddenImage) hiddenImage.classList.add('hidden-content');
-
-                 if (isCorrect) {
-                     winMessage.classList.remove('hidden');
-                     isGameOver = true;
-                     isAnimating = false;
-                 } else {
-                    setTimeout(() => {
-                        if (revealedImage) revealedImage.classList.add('hidden-content');
-                        if (hiddenImage) hiddenImage.classList.remove('hidden-content');
-                        isAnimating = false;
-                        if (!isGameOver) {
-                            shufflePositions();
-                        }
-                    }, 500);
-                 }
-            }
-
-            // Oyun döngüsü: Tıklama olaylarını yönetir
-            buttonGrid.addEventListener('click', (event) => {
-                if (isGameOver || isAnimating) return;
-                
-                const clickedButton = event.target.closest('button');
-                if (!clickedButton) return;
-                
-                isAnimating = true;
-                clickCount++;
-
-                if (clickCount === 49) {
-                    revealButton(clickedButton, correctImageUrl, true);
-                } else {
-                    const randomWrongImage = wrongImageUrls[Math.floor(Math.random() * wrongImageUrls.length)];
-                    revealButton(clickedButton, randomWrongImage, false);
-                }
-            });
-
-            // Oyunu başlat
-            resetGame();
-        };
-    </script>
 </body>
 </html>
