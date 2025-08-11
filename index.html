@@ -1,91 +1,222 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dokununca Kaçan Resim</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #f0f0f0;
-      overflow: hidden;
-    }
-    #container {
-      position: relative;
-      width: 90vw;
-      height: 90vh;
-      border: 2px solid #ccc;
-      background-color: white;
-      overflow: hidden;
-    }
-    #image {
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      cursor: pointer;
-      transition: left 0.3s ease, top 0.3s ease;
-      user-select: none;
-      touch-action: manipulation; /* dokunma için */
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papyon Kafe Kahve Yakalama Oyunu</title>
+    <!-- Tailwind CSS'i CDN üzerinden yükler -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Ekranın tamamını kaplar ve taşmaları engeller */
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden; 
+        }
+
+        /* Butonların yerlerini değiştirmek için grid kullanıyoruz */
+        #button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+            gap: 12px;
+            transition: all 0.5s ease-in-out; /* Butonların yer değişimini yumuşatır */
+        }
+        
+        .game-button {
+            position: relative;
+            overflow: hidden;
+            border: 2px solid theme('colors.gray.700');
+        }
+
+        .button-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .hidden-content {
+            transform: scale(0);
+        }
+
+        .revealed-content {
+            transform: scale(1);
+        }
+    </style>
 </head>
-<body>
-  <div id="container">
-    <img
-      id="image"
-      src="https://i.ibb.co/Q3TgGt8m"
-      alt="Kaçan Resim"
-      draggable="false"
-    />
-  </div>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+    <!-- Oyunun ana konteyneri -->
+    <div class="relative w-full h-full bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col justify-between">
+        
+        <!-- Başlık ve açıklama -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-amber-400">Papyon Kafe Kahve Yakalama Oyunu</h1>
+            <p class="text-xs sm:text-sm text-gray-400 mt-1">Kahveyi bulmak için butonlara tıkla!</p>
+        </div>
 
-  <script>
-    const container = document.getElementById("container");
-    const img = document.getElementById("image");
+        <!-- Tıklama hakkı sayacı -->
+        <div id="attempts-display" class="absolute top-2 right-2 text-xl sm:text-3xl font-bold text-yellow-400">
+            Kalan Hak: 30
+        </div>
 
-    // Başlangıç pozisyonu
-    img.style.left = (container.clientWidth / 2 - img.clientWidth / 2) + "px";
-    img.style.top = (container.clientHeight / 2 - img.clientHeight / 2) + "px";
+        <!-- Butonlar için grid konteyneri -->
+        <div id="button-grid" class="w-full flex-grow overflow-y-auto p-2">
+            <!-- JavaScript ile butonlar buraya eklenecek -->
+        </div>
 
-    // Dokunma veya tıklama ile hareket etsin
-    function moveImage() {
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight;
-      const imgWidth = img.clientWidth;
-      const imgHeight = img.clientHeight;
+        <!-- Kazanma mesajı -->
+        <div id="win-message" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-20">
+            <div class="bg-green-500 text-white text-center text-3xl sm:text-4xl font-extrabold p-8 rounded-xl shadow-2xl">
+                Kazandın! Kahveyi Buldun!
+                <button id="play-again-win" class="mt-4 px-6 py-3 bg-white text-green-500 font-bold rounded-full text-xl hover:bg-gray-200">Tekrar Oyna</button>
+            </div>
+        </div>
 
-      const maxLeft = containerWidth - imgWidth;
-      const maxTop = containerHeight - imgHeight;
+        <!-- Oyun bitti mesajı -->
+        <div id="game-over-message" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-20">
+            <div class="bg-red-600 text-white text-center text-3xl sm:text-4xl font-extrabold p-8 rounded-xl shadow-2xl">
+                Oyun Bitti! Tıklama Hakkın Kalmadı.
+                <button id="play-again-lose" class="mt-4 px-6 py-3 bg-white text-red-600 font-bold rounded-full text-xl hover:bg-gray-200">Tekrar Oyna</button>
+            </div>
+        </div>
+    </div>
 
-      let newLeft = Math.random() * maxLeft;
-      let newTop = Math.random() * maxTop;
+    <script>
+        window.onload = function() {
+            // Gerekli HTML elementlerine referanslar
+            const buttonGrid = document.getElementById('button-grid');
+            const winMessage = document.getElementById('win-message');
+            const gameOverMessage = document.getElementById('game-over-message');
+            const attemptsDisplay = document.getElementById('attempts-display');
+            const playAgainWinButton = document.getElementById('play-again-win');
+            const playAgainLoseButton = document.getElementById('play-again-lose');
 
-      // Çok yakın olmaması için kontrol
-      const currentLeft = parseFloat(img.style.left);
-      const currentTop = parseFloat(img.style.top);
+            const totalButtons = 55;
+            const initialAttempts = 30;
+            const bowTieImageUrl = 'https://placehold.co/100x100/fff/38bdf8?text=🎀'; // Papyon fotoğrafı
+            const sandwichImageUrl = 'https://placehold.co/100x100/593817/ffffff?text=Sandviç'; // Sandviç fotoğrafı
+            const coffeeImageUrl = 'https://placehold.co/100x100/8B4513/ffffff?text=Kahve'; // Kahve fotoğrafı
+            const buttonColors = [
+                'bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-yellow-500',
+                'bg-pink-500', 'bg-indigo-500', 'bg-teal-500', 'bg-orange-500', 'bg-cyan-500'
+            ];
+            let isGameOver = false;
+            let attempts = initialAttempts;
 
-      if (
-        Math.abs(newLeft - currentLeft) < 50 &&
-        Math.abs(newTop - currentTop) < 50
-      ) {
-        newLeft = (newLeft + 100) % maxLeft;
-        newTop = (newTop + 100) % maxTop;
-      }
+            // Oyunu sıfırlayan ve başlatan fonksiyon
+            function resetGame() {
+                isGameOver = false;
+                attempts = initialAttempts;
+                attemptsDisplay.textContent = `Kalan Hak: ${attempts}`;
+                winMessage.classList.add('hidden');
+                gameOverMessage.classList.add('hidden');
+                createButtons();
+                shufflePositions();
+            }
 
-      img.style.left = newLeft + "px";
-      img.style.top = newTop + "px";
-    }
+            // Butonları oluşturur ve karıştırır
+            function createButtons() {
+                buttonGrid.innerHTML = '';
+                const buttonData = [];
+                const coffeeIndex = Math.floor(Math.random() * totalButtons);
 
-    // Mobilde dokunma, masaüstünde tıklama ile tetiklenir
-    img.addEventListener("click", moveImage);
-    img.addEventListener("touchstart", e => {
-      e.preventDefault(); // Çift tetiklemeyi engellemek için
-      moveImage();
-    });
-  </script>
+                for (let i = 0; i < totalButtons; i++) {
+                    buttonData.push({
+                        id: i,
+                        contentUrl: (i === coffeeIndex) ? coffeeImageUrl : sandwichImageUrl,
+                        isCoffee: (i === coffeeIndex),
+                        color: buttonColors[i % buttonColors.length]
+                    });
+                }
+                
+                buttonData.sort(() => Math.random() - 0.5);
+
+                buttonData.forEach(data => {
+                    const button = document.createElement('button');
+                    button.classList.add(
+                        'game-button', data.color,
+                        'text-4xl', 'font-bold', 'text-white', 'p-4', 'rounded-xl', 'shadow-md',
+                        'transition-colors', 'duration-150', 'ease-in-out',
+                        'aspect-square'
+                    );
+                    button.dataset.isCoffee = data.isCoffee;
+                    
+                    const hiddenImage = document.createElement('img');
+                    hiddenImage.src = bowTieImageUrl;
+                    hiddenImage.classList.add('button-content', 'revealed-content'); // Başlangıçta papyon fotoğrafı görünür
+                    button.appendChild(hiddenImage);
+
+                    const revealedImage = document.createElement('img');
+                    revealedImage.src = data.contentUrl;
+                    revealedImage.classList.add('button-content', 'hidden-content'); // İçerik başlangıçta gizli
+                    button.appendChild(revealedImage);
+                    
+                    buttonGrid.appendChild(button);
+                });
+            }
+
+            // Butonların konumlarını rastgele karıştırır
+            function shufflePositions() {
+                const buttons = Array.from(buttonGrid.children);
+                buttons.forEach(button => {
+                    button.style.order = Math.floor(Math.random() * totalButtons);
+                });
+            }
+
+            // Oyun döngüsü: Tıklama olaylarını yönetir
+            buttonGrid.addEventListener('click', (event) => {
+                if (isGameOver) return;
+                
+                const clickedButton = event.target.closest('button');
+                if (clickedButton) {
+                    const isCoffee = clickedButton.dataset.isCoffee === 'true';
+                    
+                    // İçeriği ortaya çıkarır (papyonu gizler, resmi gösterir)
+                    const hiddenImage = clickedButton.querySelector('.button-content.revealed-content');
+                    const revealedImage = clickedButton.querySelector('.button-content.hidden-content');
+                    
+                    if (revealedImage) revealedImage.classList.remove('hidden-content');
+                    if (hiddenImage) hiddenImage.classList.add('hidden-content');
+
+
+                    if (isCoffee) {
+                        // Kazanma durumu
+                        winMessage.classList.remove('hidden');
+                        isGameOver = true;
+                    } else {
+                        // Yanlış tıklama: resmi kısa bir süre gösterip tekrar gizler
+                        setTimeout(() => {
+                            if (revealedImage) revealedImage.classList.add('hidden-content');
+                            if (hiddenImage) hiddenImage.classList.remove('hidden-content');
+                            if (!isGameOver) {
+                                shufflePositions();
+                            }
+                        }, 500);
+                        
+                        attempts--;
+                        attemptsDisplay.textContent = `Kalan Hak: ${attempts}`;
+
+                        if (attempts <= 0) {
+                            isGameOver = true;
+                            gameOverMessage.classList.remove('hidden');
+                        }
+                    }
+                }
+            });
+
+            // Tekrar oynama düğmelerine olay dinleyicileri ekler
+            playAgainWinButton.addEventListener('click', resetGame);
+            playAgainLoseButton.addEventListener('click', resetGame);
+
+            // Oyunu başlat
+            createButtons();
+            shufflePositions();
+        };
+    </script>
 </body>
 </html>
