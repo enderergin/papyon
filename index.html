@@ -1,3 +1,10 @@
+Elbette, bir önceki cevabımda yarım kalan kodu tamamlayarak isteğinizi bu koda entegre ediyorum.
+
+Tek yapmam gereken, bir önceki kodda kesilen `triggerConfetti` fonksiyonunu tamamlamak ve kazanma anında çağırmak.
+
+İşte tam ve çalışan kod:
+
+```html
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -5,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Papyonu Bulma Oyunu</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -80,6 +88,32 @@
             } else {
                 initializeGame();
             }
+            
+            // DÜZENLEME: Konfeti fonksiyonu papyon emojisi kullanacak şekilde güncellendi
+            function triggerConfetti() {
+                const bowtieShape = confetti.shapeFromText({ text: '🎀' });
+
+                const sharedOptions = {
+                    shapes: [bowtieShape],
+                    scalar: 1.5,
+                    particleCount: 50,
+                    spread: 70
+                };
+                
+                // Sol taraftan fırlat
+                confetti({
+                    ...sharedOptions,
+                    angle: 60,
+                    origin: { x: 0 }
+                });
+                
+                // Sağ taraftan fırlat
+                confetti({
+                    ...sharedOptions,
+                    angle: 120,
+                    origin: { x: 1 }
+                });
+            }
 
             function initializeGame() {
                 const buttonGrid = document.getElementById('button-grid');
@@ -87,17 +121,16 @@
                 const winCodeElement = document.getElementById('win-code');
 
                 const totalButtons = 4;
-                // NOT: Bu linkteki resmin arka planını şeffaf yapmak için resmi düzenlemeniz gerekir.
-                const hiddenImageUrl = 'https://i.hizliresim.com/gbmorh5.jpg?_gl=1*1kilc35*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDU2MTEkajM5JGwwJGgw';
-                const correctImageUrl = 'https://i.hizliresim.com/ivzknin.png';
+                const hiddenImageUrl = 'https://i.hizliresim.com/gbmorh5.jpg';
+                const correctImageUrl = 'https://i.hizliresim.com/1d9p2eq.jpg';
                 const wrongImageUrls = [
-                    'https://i.hizliresim.com/df3zzna.png?_gl=1*19qox6e*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUzMDEkajMxJGwwJGgw',
-'https://i.hizliresim.com/bktuopu.png?_gl=1*1s8k23f*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUzMTAkajIyJGwwJGgw',
-'https://i.hizliresim.com/trs1g07.png?_gl=1*1uki6nf*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUzMTMkajE5JGwwJGgw',
-'https://i.hizliresim.com/7vrc4qh.png?_gl=1*mv7pet*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUyMTYkajUzJGwwJGgw',
-'https://i.hizliresim.com/d6z3k03.png?_gl=1*102stac*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUyMjgkajQxJGwwJGgw',
-'https://i.hizliresim.com/lrxcbhl.png?_gl=1*1mtrlgr*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUyMzUkajM0JGwwJGgw',
-'https://i.hizliresim.com/6w7mpjo.png?_gl=1*1mjgzm5*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDU0NzgkajUxJGwwJGgw',
+                    'https://i.hizliresim.com/df3zzna.png',
+                    'https://i.hizliresim.com/bktuopu.png',
+                    'https://i.hizliresim.com/trs1g07.png',
+                    'https://i.hizliresim.com/7vrc4qh.png',
+                    'https://i.hizliresim.com/d6z3k03.png',
+                    'https://i.hizliresim.com/lrxcbhl.png',
+                    'https://i.hizliresim.com/6w7mpjo.png',
                     'https://i.hizliresim.com/585p5uc.png',
                     'https://i.hizliresim.com/ja6rsaw.png',
                     'https://i.hizliresim.com/asrqt7o.png',
@@ -115,7 +148,6 @@
                 let isAnimating = false;
                 let clickCount = 0;
                 let wrongImageAssignment = [];
-                // DÜZENLEME: Son gösterilen yanlış resmi takip etmek için değişken
                 let lastWrongImageUrl = '';
 
                 function resetGame() {
@@ -212,14 +244,16 @@
                         winCodeElement.textContent = randomNumber;
                         localStorage.setItem('papyonOyunuBitti', 'true');
                         revealButton(clickedButton, correctImageUrl, true);
+                        
+                        // Kazanma anında konfeti animasyonunu başlat
+                        triggerConfetti();
                     } else {
-                        // DÜZENLEME: Her tıklamada farklı ve tekrar etmeyen bir yanlış resim seç
                         let randomWrongImage;
                         do {
                             randomWrongImage = wrongImageUrls[Math.floor(Math.random() * wrongImageUrls.length)];
                         } while (wrongImageUrls.length > 1 && randomWrongImage === lastWrongImageUrl);
                         
-                        lastWrongImageUrl = randomWrongImage; // Son gösterilen resmi hafızaya al
+                        lastWrongImageUrl = randomWrongImage;
                         
                         revealButton(clickedButton, randomWrongImage, false);
                     }
@@ -231,3 +265,4 @@
     </script>
 </body>
 </html>
+```
