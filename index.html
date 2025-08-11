@@ -71,7 +71,7 @@
                 <p class="text-base font-light text-white mt-3">Ekran görüntüsü al, linki aç, sayfayı takip et ve buz gibi kahveni kap!</p>
                 <div id="win-code" class="my-4 text-4xl font-bold text-amber-300 tracking-wider"></div>
                 <div class="flex justify-center mt-4">
-                    <a href="#" id="win-link" class="px-6 py-3 bg-white text-green-500 font-bold rounded-full text-xl hover:bg-gray-200 flex items-center justify-center">
+                    <a href="https://www.instagram.com/papyon.caffe/" id="win-link" class="px-6 py-3 bg-white text-green-500 font-bold rounded-full text-xl hover:bg-gray-200 flex items-center justify-center">
                       Linki Aç
                     </a>
                 </div>
@@ -108,13 +108,14 @@
                 const winCodeElement = document.getElementById('win-code');
 
                 const totalButtons = 4;
-                const hiddenImageUrl = 'https://i.hizliresim.com/k69wbgj.png?_gl=1*76b1zk*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDI0MTQkajIxJGwwJGgw';
+                const hiddenImageUrl = 'https://i.hizliresim.com/o6n9gyn.png?_gl=1*a66ggo*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDI4ODUkajQyJGwwJGgw';
                 const correctImageUrl = 'https://placehold.co/200x200/4CAF50/ffffff?text=Doğru+Papyon';
                 const wrongImageUrls = [
-                    'https://placehold.co/200x200/A00000/ffffff?text=Yanlış-1','https://placehold.co/200x200/D00000/ffffff?text=Yanlış-2',
-                    'https://placehold.co/200x200/E00000/ffffff?text=Yanlış-3','https://placehold.co/200x200/F00000/ffffff?text=Yanlış-4',
-                    'https://placehold.co/200x200/A05000/ffffff?text=Yanlış-5','https://placehold.co/200x200/B06000/ffffff?text=Yanlış-6',
-                    'https://placehold.co/200x200/C07000/ffffff?text=Yanlış-7','https://placehold.co/200x200/D08000/ffffff?text=Yanlış-8'
+                    'https://i.hizliresim.com/585p5uc.png?_gl=1*tv30fn*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMwMjAkajI2JGwwJGgw','https://i.hizliresim.com/ja6rsaw.png?_gl=1*1n8k3xc*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMwNjckajQ1JGwwJGgw',
+                    'https://i.hizliresim.com/asrqt7o.png?_gl=1*qmujul*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMxMDQkajgkbDAkaDA.','https://i.hizliresim.com/l6dowwl.png?_gl=1*m8dw6y*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMxNjIkajQzJGwwJGgw',
+                    'https://i.hizliresim.com/n15j1q4.png?_gl=1*6aem0f*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMyMTEkajU1JGwwJGgw','https://i.hizliresim.com/7eupry5.png?_gl=1*10r514q*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMyNjAkajYkbDAkaDA.',
+                    'https://i.hizliresim.com/hb4jbzr.png?_gl=1*1op0gi0*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMzMDQkajQwJGwwJGgw','https://i.hizliresim.com/lv9hsb9.png?_gl=1*d6g5en*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMzMzYkajgkbDAkaDA.',
+                    'https://i.hizliresim.com/6o0krpi.png?_gl=1*gnomjf*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDM0MTQkajM5JGwwJGgw','https://i.hizliresim.com/sco84hp.png?_gl=1*18fo50z*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDM0NTgkajU2JGwwJGgw'
                 ];
                 const buttonColors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500'];
 
@@ -233,4 +234,5 @@
     </script>
 </body>
 </html>
+
 
