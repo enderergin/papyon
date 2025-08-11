@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kaçan Resim</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dokununca Kaçan Resim</title>
   <style>
     body {
       margin: 0;
@@ -16,8 +16,8 @@
     }
     #container {
       position: relative;
-      width: 80vw;
-      height: 80vh;
+      width: 90vw;
+      height: 90vh;
       border: 2px solid #ccc;
       background-color: white;
       overflow: hidden;
@@ -29,6 +29,7 @@
       cursor: pointer;
       transition: left 0.3s ease, top 0.3s ease;
       user-select: none;
+      touch-action: manipulation; /* dokunma için */
     }
   </style>
 </head>
@@ -37,7 +38,7 @@
     <img
       id="image"
       src="https://i.ibb.co/Q3TgGt8m"
-      alt="Buzlu Latte"
+      alt="Kaçan Resim"
       draggable="false"
     />
   </div>
@@ -46,29 +47,27 @@
     const container = document.getElementById("container");
     const img = document.getElementById("image");
 
-    // Başlangıç pozisyonu: ortaya koy
+    // Başlangıç pozisyonu
     img.style.left = (container.clientWidth / 2 - img.clientWidth / 2) + "px";
     img.style.top = (container.clientHeight / 2 - img.clientHeight / 2) + "px";
 
-    img.addEventListener("mouseenter", () => {
+    // Dokunma veya tıklama ile hareket etsin
+    function moveImage() {
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
-
       const imgWidth = img.clientWidth;
       const imgHeight = img.clientHeight;
 
-      // Yeni rastgele pozisyonlar hesapla (container içinde kalacak şekilde)
       const maxLeft = containerWidth - imgWidth;
       const maxTop = containerHeight - imgHeight;
 
       let newLeft = Math.random() * maxLeft;
       let newTop = Math.random() * maxTop;
 
-      // Mevcut pozisyona çok yakın olmasını önlemek için kontrol
+      // Çok yakın olmaması için kontrol
       const currentLeft = parseFloat(img.style.left);
       const currentTop = parseFloat(img.style.top);
 
-      // Eğer yeni pozisyon çok yakınsa, yeniden hesapla
       if (
         Math.abs(newLeft - currentLeft) < 50 &&
         Math.abs(newTop - currentTop) < 50
@@ -77,9 +76,15 @@
         newTop = (newTop + 100) % maxTop;
       }
 
-      // Pozisyonu güncelle
       img.style.left = newLeft + "px";
       img.style.top = newTop + "px";
+    }
+
+    // Mobilde dokunma, masaüstünde tıklama ile tetiklenir
+    img.addEventListener("click", moveImage);
+    img.addEventListener("touchstart", e => {
+      e.preventDefault(); // Çift tetiklemeyi engellemek için
+      moveImage();
     });
   </script>
 </body>
