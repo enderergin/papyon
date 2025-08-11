@@ -13,13 +13,16 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden; 
+            /* DÜZENLEME: İçeriği ortalamak için body'e flex eklendi */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #game-container {
             position: relative;
         }
         
-        /* DÜZENLEME: Grid sistemi mobil için basitleştirildi */
         #button-grid {
             display: grid;
             position: relative;
@@ -29,7 +32,7 @@
             position: relative;
             overflow: hidden;
             border: 2px solid theme('colors.gray.700');
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.1s ease-in-out;
         }
 
         .button-content {
@@ -51,7 +54,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-900 text-white p-4">
     <div id="game-container" class="relative w-full max-w-sm h-auto bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col justify-center">
         
         <div class="text-center mb-6">
@@ -62,9 +65,11 @@
         <div id="button-grid" class="w-full grid grid-cols-2 gap-0.5 place-items-center">
             </div>
 
-        <div id="win-message" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-20">
-            <div class="bg-green-500 text-white text-center text-3xl sm:text-4xl font-extrabold p-8 rounded-xl shadow-2xl">
-                Kazandın! Doğru Papyonu Buldun!
+        <div id="win-message" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-20 p-4">
+            <div class="bg-green-500 text-white text-center p-8 rounded-xl shadow-2xl">
+                <h2 class="text-3xl sm:text-4xl font-extrabold">Tebrikler Papyonu buldun!</h2>
+                <p class="text-base font-light text-white mt-3">Ekran görüntüsü al, linki aç, sayfayı takip et ve buz gibi kahveni kap!</p>
+                <div id="win-code" class="my-4 text-4xl font-bold text-amber-300 tracking-wider"></div>
                 <div class="flex justify-center mt-4">
                     <a href="#" id="win-link" class="px-6 py-3 bg-white text-green-500 font-bold rounded-full text-xl hover:bg-gray-200 flex items-center justify-center">
                       Linki Aç
@@ -74,161 +79,156 @@
         </div>
     </div>
 
+    <div id="already-played-message" class="hidden text-center text-white">
+        <h1 class="text-3xl font-bold text-amber-400">Oyun Bitti!</h1>
+        <p class="mt-2 text-lg">Bu oyunu daha önce oynadınız.</p>
+    </div>
+
+
     <script>
         window.onload = function() {
-            const buttonGrid = document.getElementById('button-grid');
-            const winMessage = document.getElementById('win-message');
-            const winLinkButton = document.getElementById('win-link');
 
-            const totalButtons = 4; 
-            const hiddenImageUrl = 'https://placehold.co/200x200/38bdf8/ffffff?text=Gizli'; 
-            const correctImageUrl = 'https://placehold.co/200x200/4CAF50/ffffff?text=Doğru+Papyon'; 
-            
-            const wrongImageUrls = [
-                'https://placehold.co/200x200/A00000/ffffff?text=Yanlış-1','https://placehold.co/200x200/D00000/ffffff?text=Yanlış-2',
-                'https://placehold.co/200x200/E00000/ffffff?text=Yanlış-3','https://placehold.co/200x200/F00000/ffffff?text=Yanlış-4',
-                'https://placehold.co/200x200/A05000/ffffff?text=Yanlış-5','https://placehold.co/200x200/B06000/ffffff?text=Yanlış-6',
-                'https://placehold.co/200x200/C07000/ffffff?text=Yanlış-7','https://placehold.co/200x200/D08000/ffffff?text=Yanlış-8',
-                'https://placehold.co/200x200/A0A000/ffffff?text=Yanlış-9','https://placehold.co/200x200/B0B000/ffffff?text=Yanlış-10',
-                'https://placehold.co/200x200/C0C000/ffffff?text=Yanlış-11','https://placehold.co/200x200/D0D000/ffffff?text=Yanlış-12',
-                'https://placehold.co/200x200/00A000/ffffff?text=Yanlış-13','https://placehold.co/200x200/00B000/ffffff?text=Yanlış-14',
-                'https://placehold.co/200x200/00C000/ffffff?text=Yanlış-15','https://placehold.co/200x200/00D000/ffffff?text=Yanlış-16',
-                'https://placehold.co/200x200/00A0A0/ffffff?text=Yanlış-17','https://placehold.co/200x200/00B0B0/ffffff?text=Yanlış-18',
-                'https://placehold.co/200x200/00C0C0/ffffff?text=Yanlış-19','https://placehold.co/200x200/00D0D0/ffffff?text=Yanlış-20'
-            ];
-            
-            const buttonColors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500'];
-            
-            let isGameOver = false;
-            let isAnimating = false;
-            // DÜZENLEME: clickCount mantığı geri getirildi.
-            let clickCount = 0; 
-            let wrongImageAssignment = []; 
+            // DÜZENLEME: Gerekli elementlere referanslar burada tanımlanıyor
+            const gameContainer = document.getElementById('game-container');
+            const alreadyPlayedMessage = document.getElementById('already-played-message');
 
-            function resetGame() {
-                isGameOver = false;
-                isAnimating = false;
-                // DÜZENLEME: clickCount sıfırlanıyor.
-                clickCount = 0;
-                winMessage.classList.add('hidden');
-                wrongImageAssignment = [...wrongImageUrls];
-                shuffleArray(wrongImageAssignment);
-                createButtons();
-                shufflePositions();
+            // DÜZENLEME: Oyuncunun daha önce oynayıp oynamadığını kontrol et
+            if (localStorage.getItem('papyonOyunuBitti') === 'true') {
+                // Oynadıysa, oyun konteynerini gizle ve uyarıyı göster
+                gameContainer.style.display = 'none';
+                alreadyPlayedMessage.classList.remove('hidden');
+            } else {
+                // Oynamadıysa, oyunu normal şekilde başlat
+                initializeGame();
             }
 
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
+            function initializeGame() {
+                const buttonGrid = document.getElementById('button-grid');
+                const winMessage = document.getElementById('win-message');
+                const winCodeElement = document.getElementById('win-code');
+
+                const totalButtons = 4;
+                const hiddenImageUrl = 'https://placehold.co/200x200/38bdf8/ffffff?text=Gizli';
+                const correctImageUrl = 'https://placehold.co/200x200/4CAF50/ffffff?text=Doğru+Papyon';
+                const wrongImageUrls = [
+                    'https://placehold.co/200x200/A00000/ffffff?text=Yanlış-1','https://placehold.co/200x200/D00000/ffffff?text=Yanlış-2',
+                    'https://placehold.co/200x200/E00000/ffffff?text=Yanlış-3','https://placehold.co/200x200/F00000/ffffff?text=Yanlış-4',
+                    'https://placehold.co/200x200/A05000/ffffff?text=Yanlış-5','https://placehold.co/200x200/B06000/ffffff?text=Yanlış-6',
+                    'https://placehold.co/200x200/C07000/ffffff?text=Yanlış-7','https://placehold.co/200x200/D08000/ffffff?text=Yanlış-8'
+                ];
+                const buttonColors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500'];
+
+                let isGameOver = false;
+                let isAnimating = false;
+                let clickCount = 0;
+                let wrongImageAssignment = [];
+
+                function resetGame() {
+                    isGameOver = false;
+                    isAnimating = false;
+                    clickCount = 0;
+                    winMessage.classList.add('hidden');
+                    wrongImageAssignment = [...wrongImageUrls];
+                    shuffleArray(wrongImageAssignment);
+                    createButtons();
+                    shufflePositions();
                 }
-            }
-            
-            function shufflePositions() {
-                const buttons = Array.from(buttonGrid.children);
-                if (buttons.length === 0) return;
 
-                const initialPositions = buttons.map(button => button.getBoundingClientRect());
-                const shuffledButtons = [...buttons];
-                shuffleArray(shuffledButtons);
-                
-                shuffledButtons.forEach(button => buttonGrid.appendChild(button));
-                const finalPositions = buttons.map(button => button.getBoundingClientRect());
+                function shuffleArray(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                }
 
-                buttons.forEach((button, index) => {
-                    const originalButtonOrder = buttons.findIndex(b => b === shuffledButtons[index]);
-                    const deltaX = initialPositions[originalButtonOrder].left - finalPositions[index].left;
-                    const deltaY = initialPositions[originalButtonOrder].top - finalPositions[index].top;
-
-                    button.style.transition = 'none';
-                    // DÜZELTME: Yazım hatası düzeltildi.
-                    button.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-                    
-                    requestAnimationFrame(() => {
+                function shufflePositions() {
+                    const buttons = Array.from(buttonGrid.children);
+                    if (buttons.length === 0) return;
+                    const initialPositions = buttons.map(button => button.getBoundingClientRect());
+                    const shuffledButtons = [...buttons];
+                    shuffleArray(shuffledButtons);
+                    shuffledButtons.forEach(button => buttonGrid.appendChild(button));
+                    const finalPositions = buttons.map(button => button.getBoundingClientRect());
+                    buttons.forEach((button, index) => {
+                        const originalButtonOrder = buttons.findIndex(b => b === shuffledButtons[index]);
+                        const deltaX = initialPositions[originalButtonOrder].left - finalPositions[index].left;
+                        const deltaY = initialPositions[originalButtonOrder].top - finalPositions[index].top;
+                        button.style.transition = 'none';
+                        button.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
                         requestAnimationFrame(() => {
-                            button.style.transition = 'transform 0.2s ease-in-out';
-                            button.style.transform = '';
+                            requestAnimationFrame(() => {
+                                button.style.transition = 'transform 0.1s ease-in-out';
+                                button.style.transform = '';
+                            });
                         });
                     });
-                });
-            }
-
-            function createButtons() {
-                buttonGrid.innerHTML = '';
-                
-                for (let i = 0; i < totalButtons; i++) {
-                    const button = document.createElement('button');
-                    button.classList.add(
-                        'game-button', buttonColors[i % buttonColors.length],
-                        'text-4xl', 'font-bold', 'text-white', 'p-4', 'rounded-xl', 'shadow-md',
-                        'transition-colors', 'duration-150', 'ease-in-out',
-                        'aspect-square', 'w-full'
-                    );
-                    button.dataset.buttonIndex = i;
-                    
-                    const hiddenImage = document.createElement('img');
-                    hiddenImage.src = hiddenImageUrl;
-                    hiddenImage.classList.add('button-content', 'content-visible'); 
-                    button.appendChild(hiddenImage);
-
-                    const revealedImage = document.createElement('img');
-                    revealedImage.src = wrongImageAssignment[i];
-                    revealedImage.classList.add('button-content', 'content-hidden'); 
-                    button.appendChild(revealedImage);
-                    
-                    buttonGrid.appendChild(button);
                 }
-            }
 
-            function revealButton(button, imageUrl, isCorrect) {
-                 const hiddenImage = button.querySelector('.content-visible');
-                 const revealedImage = button.querySelector('.content-hidden');
-                 
-                 revealedImage.src = imageUrl;
+                function createButtons() {
+                    buttonGrid.innerHTML = '';
+                    for (let i = 0; i < totalButtons; i++) {
+                        const button = document.createElement('button');
+                        button.classList.add('game-button', buttonColors[i % buttonColors.length], 'text-4xl', 'font-bold', 'text-white', 'p-4', 'rounded-xl', 'shadow-md', 'transition-colors', 'duration-150', 'ease-in-out', 'aspect-square', 'w-full');
+                        button.dataset.buttonIndex = i;
+                        const hiddenImage = document.createElement('img');
+                        hiddenImage.src = hiddenImageUrl;
+                        hiddenImage.classList.add('button-content', 'content-visible');
+                        button.appendChild(hiddenImage);
+                        const revealedImage = document.createElement('img');
+                        revealedImage.src = wrongImageAssignment[i];
+                        revealedImage.classList.add('button-content', 'content-hidden');
+                        button.appendChild(revealedImage);
+                        buttonGrid.appendChild(button);
+                    }
+                }
 
-                 if (hiddenImage) hiddenImage.classList.replace('content-visible', 'content-hidden');
-                 if (revealedImage) revealedImage.classList.replace('content-hidden', 'content-visible');
-                 
-                 if (isCorrect) {
-                     winMessage.classList.remove('hidden');
-                     isGameOver = true;
-                     isAnimating = false;
-                 } else {
-                    setTimeout(() => {
-                        if (revealedImage) revealedImage.classList.replace('content-visible', 'content-hidden');
-                        if (hiddenImage) hiddenImage.classList.replace('content-hidden', 'content-visible');
-                        
+                function revealButton(button, imageUrl, isCorrect) {
+                    const hiddenImage = button.querySelector('.content-visible');
+                    const revealedImage = button.querySelector('.content-hidden');
+                    revealedImage.src = imageUrl;
+                    if (hiddenImage) hiddenImage.classList.replace('content-visible', 'content-hidden');
+                    if (revealedImage) revealedImage.classList.replace('content-hidden', 'content-visible');
+                    if (isCorrect) {
+                        winMessage.classList.remove('hidden');
+                        isGameOver = true;
+                        isAnimating = false;
+                    } else {
                         setTimeout(() => {
-                            isAnimating = false;
-                            if (!isGameOver) {
-                                shufflePositions();
-                            }
-                        }, 200);
-
-                    }, 500);
-                 }
-            }
-
-            buttonGrid.addEventListener('click', (event) => {
-                if (isGameOver || isAnimating) return;
-                
-                const clickedButton = event.target.closest('button');
-                if (!clickedButton) return;
-                
-                isAnimating = true;
-                // DÜZENLEME: Kazanma mantığı clickCount'a göre çalışıyor.
-                clickCount++;
-
-                if (clickCount === 49) {
-                    revealButton(clickedButton, correctImageUrl, true);
-                } else {
-                    const buttonIndex = parseInt(clickedButton.dataset.buttonIndex);
-                    const assignedWrongImage = wrongImageAssignment[buttonIndex];
-                    revealButton(clickedButton, assignedWrongImage, false);
+                            if (revealedImage) revealedImage.classList.replace('content-visible', 'content-hidden');
+                            if (hiddenImage) hiddenImage.classList.replace('content-hidden', 'content-visible');
+                            setTimeout(() => {
+                                isAnimating = false;
+                                if (!isGameOver) {
+                                    shufflePositions();
+                                }
+                            }, 100);
+                        }, 500);
+                    }
                 }
-            });
 
-            resetGame();
+                buttonGrid.addEventListener('click', (event) => {
+                    if (isGameOver || isAnimating) return;
+                    const clickedButton = event.target.closest('button');
+                    if (!clickedButton) return;
+                    isAnimating = true;
+                    clickCount++;
+                    if (clickCount === 49) {
+                        const randomNumber = Math.floor(Math.random() * 9000) + 1000;
+                        winCodeElement.textContent = randomNumber;
+                        
+                        // DÜZENLEME: Oyunun bittiğini tarayıcı hafızasına kaydet
+                        localStorage.setItem('papyonOyunuBitti', 'true');
+
+                        revealButton(clickedButton, correctImageUrl, true);
+                    } else {
+                        const buttonIndex = parseInt(clickedButton.dataset.buttonIndex);
+                        const assignedWrongImage = wrongImageAssignment[buttonIndex];
+                        revealButton(clickedButton, assignedWrongImage, false);
+                    }
+                });
+
+                resetGame();
+            }
         };
     </script>
 </body>
