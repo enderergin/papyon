@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kaçan Resim</title>
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f0f8ff, #e6ffe9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stage {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    touch-action: none; /* mobilde kaydırma engeli */
+  }
+
+  .runner {
+    position: absolute;
+    width: 25vw; /* ekran genişliğinin %25’i */
+    max-width: 160px; /* çok büyümesin */
+    height: auto;
+    border-radius: 8px;
+    transition: left 0.25s ease, top 0.25s ease;
+    pointer-events: none;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .hint {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    background: rgba(255,255,255,0.8);
+    padding: 6px 10px;
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <img src="https://i.hizliresim.com/k17nivd.png" alt="Resim" id="runner" class="runner">
+  <div class="hint">Parmağını veya fareyi yaklaştır, resim kaçsın!</div>
+</div>
+
+<script>
+(function(){
+  const stage = document.getElementById('stage');
+  const img   = document.getElementById('runner');
+
+  let stageW = stage.clientWidth;
+  let stageH = stage.clientHeight;
+  let imgW = img.clientWidth;
+  let imgH = img.clientHeight;
+
+  let pos = { x: (stageW - imgW) / 2, y: (stageH - imgH) / 2 };
+  applyPos();
+
+  const escapeRadius = 100; // ne kadar yaklaşınca kaçacak
+  const escapeAmount = 120; // kaçış mesafesi
+
+  window.addEventListener('resize', () => {
+    stageW = stage.clientWidth;
+    stageH = stage.clientHeight;
+    imgW = img.clientWidth;
+    imgH = img.clientHeight;
+    clampPos();
+    applyPos();
+  });
+
+  function onMove(x, y) {
+    const imgCenterX = pos.x + imgW / 2;
+    const imgCenterY = pos.y + imgH / 2;
+    const dx = imgCenterX - x;
+    const dy = imgCenterY - y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist < escapeRadius) {
+      let nx = dx / (dist || 1);
+      let ny = dy / (dist || 1);
+      pos.x += nx * escapeAmount;
+      pos.y += ny * escapeAmount;
+      clampPos();
+      applyPos();
+    }
+  }
+
+  function clampPos(){
+    pos.x = Math.max(0, Math.min(stageW - imgW, pos.x));
+    pos.y = Math.max(0, Math.min(stageH - imgH, pos.y));
+  }
+
+  function applyPos(){
+    img.style.left = pos.x + 'px';
+    img.style.top  = pos.y + 'px';
+  }
+
+  // Fare hareketi
+  stage.addEventListener('mousemove', (e) => {
+    const rect = stage.getBoundingClientRect();
+    onMove(e.c
