@@ -13,28 +13,18 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden; 
-            /* DÜZENLEME: İçeriği ortalamak için body'e flex eklendi */
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
-        #game-container {
-            position: relative;
-        }
-        
-        #button-grid {
-            display: grid;
-            position: relative;
-        }
-        
+        #game-container { position: relative; }
+        #button-grid { display: grid; position: relative; }
         .game-button {
             position: relative;
             overflow: hidden;
             border: 2px solid theme('colors.gray.700');
             transition: transform 0.1s ease-in-out;
         }
-
         .button-content {
             position: absolute;
             top: 0;
@@ -44,14 +34,8 @@
             transition: transform 0.3s ease-in-out;
             object-fit: cover;
         }
-
-        .content-hidden {
-            transform: scale(0);
-        }
-
-        .content-visible {
-            transform: scale(1);
-        }
+        .content-hidden { transform: scale(0); }
+        .content-visible { transform: scale(1); }
     </style>
 </head>
 <body class="bg-gray-900 text-white p-4">
@@ -87,18 +71,13 @@
 
     <script>
         window.onload = function() {
-
-            // DÜZENLEME: Gerekli elementlere referanslar burada tanımlanıyor
             const gameContainer = document.getElementById('game-container');
             const alreadyPlayedMessage = document.getElementById('already-played-message');
 
-            // DÜZENLEME: Oyuncunun daha önce oynayıp oynamadığını kontrol et
             if (localStorage.getItem('papyonOyunuBitti') === 'true') {
-                // Oynadıysa, oyun konteynerini gizle ve uyarıyı göster
                 gameContainer.style.display = 'none';
                 alreadyPlayedMessage.classList.remove('hidden');
             } else {
-                // Oynamadıysa, oyunu normal şekilde başlat
                 initializeGame();
             }
 
@@ -108,14 +87,27 @@
                 const winCodeElement = document.getElementById('win-code');
 
                 const totalButtons = 4;
-                const hiddenImageUrl = 'https://i.hizliresim.com/o6n9gyn.png?_gl=1*a66ggo*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDI4ODUkajQyJGwwJGgw';
-                const correctImageUrl = 'https://placehold.co/200x200/4CAF50/ffffff?text=Doğru+Papyon';
+                // NOT: Bu linkteki resmin arka planını şeffaf yapmak için resmi düzenlemeniz gerekir.
+                const hiddenImageUrl = 'https://i.hizliresim.com/gbmorh5.jpg?_gl=1*1kilc35*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDU2MTEkajM5JGwwJGgw';
+                const correctImageUrl = 'https://i.hizliresim.com/ivzknin.png';
                 const wrongImageUrls = [
-                    'https://i.hizliresim.com/585p5uc.png?_gl=1*tv30fn*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMwMjAkajI2JGwwJGgw','https://i.hizliresim.com/ja6rsaw.png?_gl=1*1n8k3xc*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMwNjckajQ1JGwwJGgw',
-                    'https://i.hizliresim.com/asrqt7o.png?_gl=1*qmujul*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMxMDQkajgkbDAkaDA.','https://i.hizliresim.com/l6dowwl.png?_gl=1*m8dw6y*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMxNjIkajQzJGwwJGgw',
-                    'https://i.hizliresim.com/n15j1q4.png?_gl=1*6aem0f*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMyMTEkajU1JGwwJGgw','https://i.hizliresim.com/7eupry5.png?_gl=1*10r514q*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMyNjAkajYkbDAkaDA.',
-                    'https://i.hizliresim.com/hb4jbzr.png?_gl=1*1op0gi0*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMzMDQkajQwJGwwJGgw','https://i.hizliresim.com/lv9hsb9.png?_gl=1*d6g5en*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDMzMzYkajgkbDAkaDA.',
-                    'https://i.hizliresim.com/6o0krpi.png?_gl=1*gnomjf*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDM0MTQkajM5JGwwJGgw','https://i.hizliresim.com/sco84hp.png?_gl=1*18fo50z*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDM0NTgkajU2JGwwJGgw'
+                    'https://i.hizliresim.com/df3zzna.png?_gl=1*19qox6e*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUzMDEkajMxJGwwJGgw',
+'https://i.hizliresim.com/bktuopu.png?_gl=1*1s8k23f*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUzMTAkajIyJGwwJGgw',
+'https://i.hizliresim.com/trs1g07.png?_gl=1*1uki6nf*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUzMTMkajE5JGwwJGgw',
+'https://i.hizliresim.com/7vrc4qh.png?_gl=1*mv7pet*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUyMTYkajUzJGwwJGgw',
+'https://i.hizliresim.com/d6z3k03.png?_gl=1*102stac*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUyMjgkajQxJGwwJGgw',
+'https://i.hizliresim.com/lrxcbhl.png?_gl=1*1mtrlgr*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDUyMzUkajM0JGwwJGgw',
+'https://i.hizliresim.com/6w7mpjo.png?_gl=1*1mjgzm5*_ga*NDgzMjAxNzQ4LjE3NTQ5MDgzMTI.*_ga_M9ZRXYS2YN*czE3NTQ5NDIzNzUkbzUkZzEkdDE3NTQ5NDU0NzgkajUxJGwwJGgw',
+                    'https://i.hizliresim.com/585p5uc.png',
+                    'https://i.hizliresim.com/ja6rsaw.png',
+                    'https://i.hizliresim.com/asrqt7o.png',
+                    'https://i.hizliresim.com/l6dowwl.png',
+                    'https://i.hizliresim.com/n15j1q4.png',
+                    'https://i.hizliresim.com/7eupry5.png',
+                    'https://i.hizliresim.com/hb4jbzr.png',
+                    'https://i.hizliresim.com/lv9hsb9.png',
+                    'https://i.hizliresim.com/6o0krpi.png',
+                    'https://i.hizliresim.com/sco84hp.png'
                 ];
                 const buttonColors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500'];
 
@@ -123,6 +115,8 @@
                 let isAnimating = false;
                 let clickCount = 0;
                 let wrongImageAssignment = [];
+                // DÜZENLEME: Son gösterilen yanlış resmi takip etmek için değişken
+                let lastWrongImageUrl = '';
 
                 function resetGame() {
                     isGameOver = false;
@@ -216,15 +210,18 @@
                     if (clickCount === 49) {
                         const randomNumber = Math.floor(Math.random() * 9000) + 1000;
                         winCodeElement.textContent = randomNumber;
-                        
-                        // DÜZENLEME: Oyunun bittiğini tarayıcı hafızasına kaydet
                         localStorage.setItem('papyonOyunuBitti', 'true');
-
                         revealButton(clickedButton, correctImageUrl, true);
                     } else {
-                        const buttonIndex = parseInt(clickedButton.dataset.buttonIndex);
-                        const assignedWrongImage = wrongImageAssignment[buttonIndex];
-                        revealButton(clickedButton, assignedWrongImage, false);
+                        // DÜZENLEME: Her tıklamada farklı ve tekrar etmeyen bir yanlış resim seç
+                        let randomWrongImage;
+                        do {
+                            randomWrongImage = wrongImageUrls[Math.floor(Math.random() * wrongImageUrls.length)];
+                        } while (wrongImageUrls.length > 1 && randomWrongImage === lastWrongImageUrl);
+                        
+                        lastWrongImageUrl = randomWrongImage; // Son gösterilen resmi hafızaya al
+                        
+                        revealButton(clickedButton, randomWrongImage, false);
                     }
                 });
 
@@ -234,5 +231,3 @@
     </script>
 </body>
 </html>
-
-
