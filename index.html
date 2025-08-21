@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -49,7 +48,7 @@
         </div>
 
         <div id="button-grid" class="w-full grid grid-cols-2 gap-0.5 place-items-center">
-            </div>
+        </div>
 
         <div id="win-message" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-20 p-4">
             <div class="bg-green-500 text-white text-center p-8 rounded-xl shadow-2xl">
@@ -58,7 +57,7 @@
                 <div id="win-code" class="my-4 text-4xl font-bold text-amber-300 tracking-wider"></div>
                 <div class="flex justify-center mt-4">
                     <a href="https://www.instagram.com/papyon.caffe/" id="win-link" class="px-6 py-3 bg-white text-green-500 font-bold rounded-full text-xl hover:bg-gray-200 flex items-center justify-center">
-                      Linki Aç
+                        Linki Aç
                     </a>
                 </div>
             </div>
@@ -178,7 +177,8 @@
                         button.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
                         requestAnimationFrame(() => {
                             requestAnimationFrame(() => {
-                                button.style.transition = 'transform 0.1s ease-in-out';
+                                // DÜZENLEME: Hız yavaşlatıldı
+                                button.style.transition = 'transform 0.125s ease-in-out';
                                 button.style.transform = '';
                             });
                         });
@@ -233,7 +233,8 @@
                     if (!clickedButton) return;
                     isAnimating = true;
                     clickCount++;
-                    if (clickCount === 49) {
+                    // DÜZENLEME: Tıklama sayısı değiştirildi
+                    if (clickCount === 29) {
                         const randomNumber = Math.floor(Math.random() * 9000) + 1000;
                         winCodeElement.textContent = randomNumber;
                         localStorage.setItem('papyonOyunuBitti', 'true');
@@ -259,5 +260,3 @@
     </script>
 </body>
 </html>
-```
-
